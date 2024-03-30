@@ -35,10 +35,10 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 ARG USER=km
 RUN \
     # Create user
-    echo "Creating user $USER" && \
-    adduser -D -h /app -s /bin/sh $USER && \
+    Debian: useradd --create-home --user-group $USER --shell /bin/bash && \
+    #adduser -D -h /app -s /bin/sh $USER && \
     # Allow user to access the build
-    chown -R $USER:$USER /app
+    chown -R $USER.$USER /app
 
 # Define current user
 USER $USER
