@@ -33,7 +33,7 @@ RUN dotnet publish "./Service.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 # Non-root user that will run the service
 ARG USER=km
-RUN \
+RUN mkdir -p /app && \
     # Create user
     useradd --create-home --user-group $USER --shell /bin/bash && \
     #adduser -D -h /app -s /bin/sh $USER && \
