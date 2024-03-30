@@ -55,7 +55,8 @@ FROM base AS final
 MAINTAINER Devis Lucato "https://github.com/dluc"
 WORKDIR /app
 
-COPY --from=publish --chown=km:km --chmod=0550  /app/publish .
+COPY --from=publish --chown=km:km /app/publish .
+RUN chmod 0550 /app/publish
 
 # Define executable
 ENTRYPOINT ["dotnet", "Microsoft.KernelMemory.ServiceAssembly.dll"]
