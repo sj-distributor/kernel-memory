@@ -35,7 +35,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 ARG USER=km
 RUN \
     # Create user
-    Debian: useradd --create-home --user-group $USER --shell /bin/bash && \
+    useradd --create-home --user-group $USER --shell /bin/bash && \
     #adduser -D -h /app -s /bin/sh $USER && \
     # Allow user to access the build
     chown -R $USER.$USER /app
