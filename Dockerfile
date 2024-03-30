@@ -5,7 +5,7 @@ ARG RUN_IMAGE_TAG="7.0-alpine"
 # build and publish
 #########################################################################
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:$BUILD_IMAGE_TAG AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 
 ARG TARGETARCH
@@ -30,7 +30,7 @@ RUN dotnet publish "./Service.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p
 # run
 #########################################################################
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:$RUN_IMAGE_TAG AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 # Non-root user that will run the service
 ARG USER=km
 RUN \
