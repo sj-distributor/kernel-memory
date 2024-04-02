@@ -35,8 +35,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS base
 ARG USER=km
 RUN mkdir -p /app && \
     # Create user
-    useradd --create-home --user-group $USER --shell /bin/bash && \
-    #adduser -D -h /app -s /bin/sh $USER && \
+    # useradd --create-home --user-group $USER --shell /bin/bash && \
+    adduser -D -h /app -s /bin/sh $USER && \
     # Allow user to access the build
     chown -R $USER:$USER /app
 
