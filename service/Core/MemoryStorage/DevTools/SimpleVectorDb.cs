@@ -104,17 +104,24 @@ public class SimpleVectorDb : IMemoryDb
         index = NormalizeIndexName(index);
 
         var list = this.GetListAsync(index, filters, int.MaxValue, withEmbeddings, cancellationToken);
+
+        this._log.LogInformation("Searching for similar vectors in {@Index} with file{@File}", index, list);
+
         var records = new Dictionary<string, MemoryRecord>();
         await foreach (MemoryRecord r in list.WithCancellation(cancellationToken).ConfigureAwait(false))
         {
             records[r.Id] = r;
         }
 
+        this._log.LogInformation("Searching for similar vectors record: {@Record}", records);
+
         // Calculate all the distances from the given vector
         // Note: this is a brute force search, very slow, not meant for production use cases
         var similarity = new Dictionary<string, double>();
-        Embedding textEmbedding = await this._embeddingGenerator.GenerateEmbeddingAsync
-            (text, cancellationToken).ConfigureAwait(false);
+        Embedding textEmbedding = await this._embeddingGenerator.GenerateEmbeddingAsync(text, cancellationToken).ConfigureAwait(false);
+
+        this._log.LogInformation("Generating embedding: {@TextEmbedding}", textEmbedding);
+
         foreach (var record in records)
         {
             similarity[record.Value.Id] = textEmbedding.CosineSimilarity(record.Value.Vector);
