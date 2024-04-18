@@ -16,6 +16,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Serilog" />
+        <PackageReference Include="Serilog.AspNetCore" />
+        <PackageReference Include="Serilog.Enrichers.CorrelationId" />
+        <PackageReference Include="Serilog.Sinks.Seq" />
         <PackageReference Include="System.Linq.Async"/>
         <PackageReference Include="NRedisStack"/>
     </ItemGroup>

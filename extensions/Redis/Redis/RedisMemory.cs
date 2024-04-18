@@ -13,6 +13,7 @@ using NRedisStack;
 using NRedisStack.RedisStackCommands;
 using NRedisStack.Search;
 using NRedisStack.Search.Literals.Enums;
+using Serilog;
 using StackExchange.Redis;
 
 namespace Microsoft.KernelMemory.MemoryDb.Redis;
@@ -149,7 +150,7 @@ public sealed class RedisMemory : IMemoryDb
 
         var scriptResult = (await this._db.ScriptEvaluateAsync(Scripts.CheckIndexAndUpsert, new RedisKey[] { key }, args.ToArray()).ConfigureAwait(false)).ToString()!;
         this._logger.LogInformation("Upsert redis script execute result: {@ScriptResult}\nkey:{@Key}\n{@Args},", scriptResult, key, args.ToArray());
-        
+
         if (scriptResult == "false")
         {
             await this.CreateIndexAsync(index, record.Vector.Length, cancellationToken).ConfigureAwait(false);
@@ -168,14 +169,15 @@ public sealed class RedisMemory : IMemoryDb
     {
         var normalizedIndexName = NormalizeIndexName(index, this._config.AppPrefix);
         var embedding = await this._embeddingGenerator.GenerateEmbeddingAsync(text, cancellationToken).ConfigureAwait(false);
-        this._logger.LogInformation("Generating embedding: {@Parameters}", embedding);
+        Log.Information("Generating embedding: {@Parameters}", embedding);
         var blob = embedding.VectorBlob();
         var parameters = new Dictionary<string, object>
         {
             { "blob", blob },
             { "limit", limit }
         };
-        this._logger.LogInformation("Getting similar list: {@Parameters}", parameters);
+
+        Log.Information("Getting similar list: {@Parameters}", parameters);
 
         var sb = new StringBuilder();
         if (filters != null && filters.Any(x => x.Pairs.Any()))

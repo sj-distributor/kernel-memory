@@ -34,6 +34,10 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
         <PackageReference Include="PdfPig"/>
         <PackageReference Include="Polly.Core"/>
+        <PackageReference Include="Serilog" />
+        <PackageReference Include="Serilog.AspNetCore" />
+        <PackageReference Include="Serilog.Enrichers.CorrelationId" />
+        <PackageReference Include="Serilog.Sinks.Seq" />
         <PackageReference Include="System.Linq.Async"/>
     </ItemGroup>
 

@@ -253,6 +253,7 @@ public abstract class BaseOrchestrator : IPipelineOrchestrator, IDisposable
     ///<inheritdoc />
     public List<IMemoryDb> GetMemoryDbs()
     {
+        Serilog.Log.Information("Saving embeddings' dbs: {@Dbs}", this._memoryDbs);
         return this._memoryDbs;
     }
 
@@ -428,7 +429,7 @@ public abstract class BaseOrchestrator : IPipelineOrchestrator, IDisposable
     private async Task UploadFormFilesAsync(DataPipeline pipeline, CancellationToken cancellationToken)
     {
         this.Log.LogDebug("Uploading {0} files, pipeline '{1}/{2}'", pipeline.FilesToUpload.Count, pipeline.Index, pipeline.DocumentId);
-
+        Serilog.Log.Information($"Saving embeddings' dbs: {this._memoryDbs}");
         await this._contentStorage.CreateIndexDirectoryAsync(pipeline.Index, cancellationToken).ConfigureAwait(false);
         await this._contentStorage.CreateDocumentDirectoryAsync(pipeline.Index, pipeline.DocumentId, cancellationToken).ConfigureAwait(false);
 

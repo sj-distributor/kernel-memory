@@ -12,6 +12,7 @@ using Microsoft.KernelMemory.Diagnostics;
 using Microsoft.KernelMemory.FileSystem.DevTools;
 using Microsoft.KernelMemory.MemoryStorage;
 using Microsoft.KernelMemory.Pipeline;
+using Serilog;
 
 namespace Microsoft.KernelMemory.Handlers;
 
@@ -85,7 +86,7 @@ public class SaveRecordsHandler : IPipelineStepHandler
         DataPipeline pipeline, CancellationToken cancellationToken = default)
     {
         this._log.LogDebug("Saving memory records, pipeline '{0}/{1}'", pipeline.Index, pipeline.DocumentId);
-
+        Log.Information("Saving embeddings' dbs: {@Dbs}", this._memoryDbs);
         await this.DeletePreviousRecordsAsync(pipeline, cancellationToken).ConfigureAwait(false);
         pipeline.PreviousExecutionsToPurge = new List<DataPipeline>();
 
@@ -140,6 +141,7 @@ public class SaveRecordsHandler : IPipelineStepHandler
                 embeddingGeneratorName: embeddingData.GeneratorName,
                 embeddingFile.File.Tags);
 
+            this._log.LogDebug("Saving embeddings' dbs: {@Dbs}", this._memoryDbs);
             foreach (IMemoryDb client in this._memoryDbs)
             {
                 this._log.LogTrace("Creating index '{0}'", pipeline.Index);

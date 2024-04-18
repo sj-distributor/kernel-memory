@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Destructurama;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,7 @@ using Microsoft.KernelMemory.ContentStorage;
 using Microsoft.KernelMemory.Diagnostics;
 using Microsoft.KernelMemory.MemoryStorage;
 using Microsoft.KernelMemory.Pipeline;
+using Serilog;
 
 // KM Configuration:
 //
@@ -84,6 +86,8 @@ internal static class Program
         // Add HTTP endpoints using minimal API (https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis)
         app.ConfigureMinimalAPI(config);
 
+        IConfigurationSection serilog = appBuilder.Configuration.GetSection("Serilog");
+
         // *************************** START ***********************************
 
         var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -113,6 +117,14 @@ internal static class Program
             config.Service.RunWebService,
             config.ServiceAuthorization.Enabled,
             config.Service.RunHandlers);
+
+        Log.Logger = new LoggerConfiguration()
+            .Destructure.JsonNetTypes()
+            .Enrich.FromLogContext()
+            .Enrich.WithProperty("Application", "KernelMemory")
+            .WriteTo.Console()
+            .WriteTo.Seq(serilog.GetSection("ServerUrl").Value ?? string.Empty, apiKey: serilog.GetSection("ApiKey").Value ?? string.Empty)
+            .CreateLogger();
 
         // Start web service and handler services
         app.Run();
