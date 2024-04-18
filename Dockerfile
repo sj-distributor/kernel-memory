@@ -52,7 +52,6 @@ EXPOSE 9001
 
 FROM base AS final
 
-MAINTAINER Devis Lucato "https://github.com/dluc"
 WORKDIR /app
 
 RUN mkdir -p /app/publish
