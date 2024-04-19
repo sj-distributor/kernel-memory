@@ -6,7 +6,6 @@ using System.Linq;
 using Correlate.DependencyInjection;
 using Destructurama;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -83,7 +82,7 @@ internal static class Program
         // When using in process orchestration, handlers are hosted by the memory orchestrator
         var syncHandlersCount = AddHandlersToOrchestrator(config, memory);
 
-        IConfigurationSection serilog = appBuilder.Configuration.GetSection("Serilog");
+        IConfigurationSection serilog = appBuilder.Configuration.GetSection("Serilog").GetSection("Seq");
         Log.Logger = new LoggerConfiguration()
             .Destructure.JsonNetTypes()
             .Enrich.FromLogContext()
