@@ -11,6 +11,7 @@ using Microsoft.KernelMemory.MemoryStorage;
 using Microsoft.KernelMemory.MemoryStorage.DevTools;
 using Microsoft.KernelMemory.Pipeline.Queue.DevTools;
 using Microsoft.KernelMemory.Postgres;
+using Serilog;
 
 namespace Microsoft.KernelMemory.Service;
 
@@ -272,6 +273,7 @@ internal sealed class ServiceConfiguration
                     var instance = this.GetServiceInstance<IMemoryDb>(builder,
                         s => s.AddRedisAsMemoryDb(this.GetServiceConfig<RedisConfig>("Redis"))
                     );
+                    Log.Information("Getting redis instance: {@Instance}", instance);
                     builder.AddIngestionMemoryDb(instance);
                     break;
                 }
