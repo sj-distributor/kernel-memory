@@ -3,10 +3,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Correlate.DependencyInjection;
 using Destructurama;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.KernelMemory.AI;
 using Microsoft.KernelMemory.Configuration;
@@ -89,8 +92,13 @@ internal static class Program
             .WriteTo.Seq(serilog.GetSection("ServerUrl").Value ?? string.Empty, apiKey: serilog.GetSection("ApiKey").Value ?? string.Empty)
             .CreateLogger();
 
+        appBuilder.Services.AddCorrelate(options => options.RequestHeaders = new[] { "CorrelationId", "X-Correlation-ID", "x-correlation-id" });
+        appBuilder.Host.UseSerilog().ConfigureLogging(l => l.AddSerilog(Log.Logger));
+
         // Build .NET web app as usual
         WebApplication app = appBuilder.Build();
+
+        app.UseSerilogRequestLogging();
 
         // Add HTTP endpoints using minimal API (https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis)
         app.ConfigureMinimalAPI(config);
@@ -174,4 +182,10 @@ internal static class Program
 
         return orchestrator.HandlerNames.Count;
     }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .UseSerilog()
+            .ConfigureLogging(l => l.AddSerilog(Log.Logger))
+            .ConfigureWebHostDefaults(builder => { builder.UseStartup<Startup>(); });
 }

@@ -13,6 +13,10 @@
     <ItemGroup>
         <!-- Microsoft.KernelMemory.Core includes also extensions without external dependencies, e.g. all Azure extensions -->
 
+        <PackageReference Include="Correlate.AspNetCore" Version="4.0.0" />
+
+        <PackageReference Include="Correlate.DependencyInjection" Version="4.0.0" />
+
         <PackageReference Include="Destructurama.JsonNet" Version="2.0.0" />
 
         <PackageReference Include="Microsoft.KernelMemory.Core" Version="0.35.240321.1" Condition="'$(SolutionName)' != 'KernelMemoryDev'" />
