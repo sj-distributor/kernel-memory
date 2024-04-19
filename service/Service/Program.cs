@@ -82,6 +82,10 @@ internal static class Program
         // When using in process orchestration, handlers are hosted by the memory orchestrator
         var syncHandlersCount = AddHandlersToOrchestrator(config, memory);
 
+        appBuilder.Services.AddSingleton(Log.Logger);
+        appBuilder.Host.UseSerilog(Log.Logger, dispose: true).ConfigureLogging(l => l.AddSerilog(Log.Logger));
+        appBuilder.Services.AddCorrelate(options => options.RequestHeaders = new[] { "CorrelationId", "X-Correlation-ID", "x-correlation-id" });
+
         IConfigurationSection serilog = appBuilder.Configuration.GetSection("Serilog").GetSection("Seq");
         Log.Logger = new LoggerConfiguration()
             .Destructure.JsonNetTypes()
@@ -90,11 +94,6 @@ internal static class Program
             .WriteTo.Console()
             .WriteTo.Seq(serilog.GetSection("ServerUrl").Value ?? string.Empty, apiKey: serilog.GetSection("ApiKey").Value ?? string.Empty)
             .CreateLogger();
-
-        appBuilder.Services.AddCorrelate(options => options.RequestHeaders = new[] { "CorrelationId", "X-Correlation-ID", "x-correlation-id" });
-        appBuilder.Services.AddSingleton(Log.Logger);
-
-        appBuilder.Host.UseSerilog(Log.Logger, dispose: true).ConfigureLogging(l => l.AddSerilog(Log.Logger));
 
         // Build .NET web app as usual
         WebApplication app = appBuilder.Build();
