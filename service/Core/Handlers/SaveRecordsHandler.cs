@@ -13,6 +13,7 @@ using Microsoft.KernelMemory.FileSystem.DevTools;
 using Microsoft.KernelMemory.MemoryStorage;
 using Microsoft.KernelMemory.Pipeline;
 using Serilog;
+using ILogger = Serilog.ILogger;
 
 namespace Microsoft.KernelMemory.Handlers;
 
@@ -47,6 +48,7 @@ public class SaveRecordsHandler : IPipelineStepHandler
     private readonly IPipelineOrchestrator _orchestrator;
     private readonly List<IMemoryDb> _memoryDbs;
     private readonly ILogger<SaveRecordsHandler> _log;
+    private readonly ILogger _logger;
     private readonly bool _embeddingGenerationEnabled;
 
     /// <inheritdoc />
@@ -61,14 +63,14 @@ public class SaveRecordsHandler : IPipelineStepHandler
     /// <param name="log">Application logger</param>
     public SaveRecordsHandler(
         string stepName,
-        IPipelineOrchestrator orchestrator,
-        ILogger<SaveRecordsHandler>? log = null)
+        IPipelineOrchestrator orchestrator, ILogger logger, ILogger<SaveRecordsHandler>? log = null)
     {
         this.StepName = stepName;
         this._log = log ?? DefaultLogger<SaveRecordsHandler>.Instance;
         this._embeddingGenerationEnabled = orchestrator.EmbeddingGenerationEnabled;
 
         this._orchestrator = orchestrator;
+        this._logger = logger;
         this._memoryDbs = orchestrator.GetMemoryDbs();
 
         if (this._memoryDbs.Count < 1)
@@ -86,7 +88,7 @@ public class SaveRecordsHandler : IPipelineStepHandler
         DataPipeline pipeline, CancellationToken cancellationToken = default)
     {
         this._log.LogDebug("Saving memory records, pipeline '{0}/{1}'", pipeline.Index, pipeline.DocumentId);
-        this._log.LogDebug("Saving embeddings' dbs: {@Dbs}", this._memoryDbs);
+        this._logger.Information("Saving embeddings' dbs: {@Dbs}", this._memoryDbs);
         await this.DeletePreviousRecordsAsync(pipeline, cancellationToken).ConfigureAwait(false);
         pipeline.PreviousExecutionsToPurge = new List<DataPipeline>();
 
