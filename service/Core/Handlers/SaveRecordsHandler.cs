@@ -86,7 +86,7 @@ public class SaveRecordsHandler : IPipelineStepHandler
         DataPipeline pipeline, CancellationToken cancellationToken = default)
     {
         this._log.LogDebug("Saving memory records, pipeline '{0}/{1}'", pipeline.Index, pipeline.DocumentId);
-        Log.Information("Saving embeddings' dbs: {@Dbs}", this._memoryDbs);
+        this._log.LogDebug("Saving embeddings' dbs: {@Dbs}", this._memoryDbs);
         await this.DeletePreviousRecordsAsync(pipeline, cancellationToken).ConfigureAwait(false);
         pipeline.PreviousExecutionsToPurge = new List<DataPipeline>();
 
