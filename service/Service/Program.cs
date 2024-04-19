@@ -184,10 +184,4 @@ internal static class Program
 
         return orchestrator.HandlerNames.Count;
     }
-
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .UseSerilog()
-            .ConfigureLogging(l => l.AddSerilog(Log.Logger))
-            .ConfigureWebHostDefaults(builder => { builder.UseStartup<Startup>(); });
 }
