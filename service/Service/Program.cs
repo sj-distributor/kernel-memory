@@ -80,13 +80,20 @@ internal static class Program
         // When using in process orchestration, handlers are hosted by the memory orchestrator
         var syncHandlersCount = AddHandlersToOrchestrator(config, memory);
 
+        IConfigurationSection serilog = appBuilder.Configuration.GetSection("Serilog");
+        Log.Logger = new LoggerConfiguration()
+            .Destructure.JsonNetTypes()
+            .Enrich.FromLogContext()
+            .Enrich.WithProperty("Application", "KernelMemory")
+            .WriteTo.Console()
+            .WriteTo.Seq(serilog.GetSection("ServerUrl").Value ?? string.Empty, apiKey: serilog.GetSection("ApiKey").Value ?? string.Empty)
+            .CreateLogger();
+
         // Build .NET web app as usual
         WebApplication app = appBuilder.Build();
 
         // Add HTTP endpoints using minimal API (https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis)
         app.ConfigureMinimalAPI(config);
-
-        IConfigurationSection serilog = appBuilder.Configuration.GetSection("Serilog");
 
         // *************************** START ***********************************
 
@@ -117,14 +124,6 @@ internal static class Program
             config.Service.RunWebService,
             config.ServiceAuthorization.Enabled,
             config.Service.RunHandlers);
-
-        Log.Logger = new LoggerConfiguration()
-            .Destructure.JsonNetTypes()
-            .Enrich.FromLogContext()
-            .Enrich.WithProperty("Application", "KernelMemory")
-            .WriteTo.Console()
-            .WriteTo.Seq(serilog.GetSection("ServerUrl").Value ?? string.Empty, apiKey: serilog.GetSection("ApiKey").Value ?? string.Empty)
-            .CreateLogger();
 
         // Start web service and handler services
         app.Run();
