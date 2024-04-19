@@ -93,6 +93,8 @@ internal static class Program
             .CreateLogger();
 
         appBuilder.Services.AddCorrelate(options => options.RequestHeaders = new[] { "CorrelationId", "X-Correlation-ID", "x-correlation-id" });
+        appBuilder.Services.AddSingleton(Log.Logger);
+
         appBuilder.Host.UseSerilog().ConfigureLogging(l => l.AddSerilog(Log.Logger));
 
         // Build .NET web app as usual
