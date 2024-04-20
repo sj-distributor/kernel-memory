@@ -17,7 +17,6 @@ using Microsoft.KernelMemory.Diagnostics;
 using Microsoft.KernelMemory.MemoryStorage;
 using Microsoft.KernelMemory.Pipeline;
 using Serilog;
-using StackExchange.Redis;
 
 // KM Configuration:
 //
