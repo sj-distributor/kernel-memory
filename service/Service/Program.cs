@@ -123,6 +123,7 @@ internal static class Program
         Console.WriteLine("* Embedding generation: " + app.Services.GetService<ITextEmbeddingGenerator>()?.GetType().FullName);
         Console.WriteLine("* Text generation     : " + app.Services.GetService<ITextGenerator>()?.GetType().FullName);
         Console.WriteLine("* Log level           : " + app.Logger.GetLogLevelName());
+        Console.WriteLine("* Redis connection string:" + app.Configuration.GetSection("KernelMemory").GetSection("Services").GetSection("Redis").GetSection("ConnectionString"));
         Console.WriteLine("***************************************************************************************************************************");
 
         app.Logger.LogInformation(
