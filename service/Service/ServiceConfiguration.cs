@@ -273,6 +273,7 @@ internal sealed class ServiceConfiguration
                     var instance = this.GetServiceInstance<IMemoryDb>(builder,
                         s => s.AddRedisAsMemoryDb(this.GetServiceConfig<RedisConfig>("Redis"))
                     );
+                    Console.WriteLine($"Getting redis instance: {instance}");
                     Log.Information("Getting redis instance: {@Instance}", instance);
                     builder.AddIngestionMemoryDb(instance);
                     break;

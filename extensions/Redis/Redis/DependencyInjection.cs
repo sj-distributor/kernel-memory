@@ -3,6 +3,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.KernelMemory.MemoryStorage;
 using Microsoft.KernelMemory.MemoryDb.Redis;
+using Serilog;
 using StackExchange.Redis;
 
 #pragma warning disable IDE0130 // reduce number of "using" statements
@@ -55,6 +56,9 @@ public static partial class DependencyInjection
         this IServiceCollection services,
         RedisConfig redisConfig)
     {
+        Console.WriteLine($"redisConfig.ConnectionString: {redisConfig.ConnectionString}");
+        Log.Information("redisConfig.ConnectionString: {ConnectionString}", redisConfig.ConnectionString);
+
         return services
             .AddSingleton(redisConfig)
             .AddSingleton<IConnectionMultiplexer>(_ => ConnectionMultiplexer.Connect(redisConfig.ConnectionString))
