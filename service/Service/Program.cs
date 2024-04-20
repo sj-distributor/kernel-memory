@@ -17,6 +17,7 @@ using Microsoft.KernelMemory.Diagnostics;
 using Microsoft.KernelMemory.MemoryStorage;
 using Microsoft.KernelMemory.Pipeline;
 using Serilog;
+using StackExchange.Redis;
 
 // KM Configuration:
 //
@@ -111,6 +112,8 @@ internal static class Program
             app.Logger.LogError("ASPNETCORE_ENVIRONMENT env var not defined.");
         }
 
+        var connectionString = app.Configuration.GetSection("KernelMemory").GetSection("Services").GetSection("Redis").GetSection("ConnectionString").Value;
+
         Console.WriteLine("***************************************************************************************************************************");
         Console.WriteLine("* Environment         : " + (string.IsNullOrEmpty(env) ? "WARNING: ASPNETCORE_ENVIRONMENT env var not defined" : env));
         Console.WriteLine("* Memory type         : " + ((memory is MemoryServerless) ? "Sync - " : "Async - ") + memory.GetType().FullName);
@@ -123,8 +126,23 @@ internal static class Program
         Console.WriteLine("* Embedding generation: " + app.Services.GetService<ITextEmbeddingGenerator>()?.GetType().FullName);
         Console.WriteLine("* Text generation     : " + app.Services.GetService<ITextGenerator>()?.GetType().FullName);
         Console.WriteLine("* Log level           : " + app.Logger.GetLogLevelName());
-        Console.WriteLine("* Redis connection string:" + app.Configuration.GetSection("KernelMemory").GetSection("Services").GetSection("Redis").GetSection("ConnectionString").Value);
+        Console.WriteLine("* Redis connection string:" + connectionString);
         Console.WriteLine("***************************************************************************************************************************");
+
+        try
+        {
+            var redis = ConnectionMultiplexer.Connect(connectionString);
+            var db = redis.GetDatabase();
+
+            db.StringSet("monesy", "test");
+            var value = db.StringGet("monesy");
+            Console.WriteLine($"Stored value in redis {value}");
+            Console.WriteLine("Redis connectSuccessful");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
 
         app.Logger.LogInformation(
             "Starting Kernel Memory service, .NET Env: {0}, Log Level: {1}, Web service: {2}, Auth: {3}, Pipeline handlers: {4}",
@@ -182,5 +200,24 @@ internal static class Program
         }
 
         return orchestrator.HandlerNames.Count;
+    }
+
+    private static T GetServiceInstance<T>(IKernelMemoryBuilder builder, Action<IServiceCollection> addCustomService)
+    {
+        // Clone the list of service descriptors, skipping T descriptor
+        IServiceCollection services = new ServiceCollection();
+        foreach (ServiceDescriptor d in builder.Services)
+        {
+            if (d.ServiceType == typeof(T)) { continue; }
+
+            services.Add(d);
+        }
+
+        // Add the custom T descriptor
+        addCustomService.Invoke(services);
+
+        // Build and return an instance of T, as defined by `addCustomService`
+        return services.BuildServiceProvider().GetService<T>()
+               ?? throw new ConfigurationException($"Unable to build {nameof(T)}");
     }
 }
