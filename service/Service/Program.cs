@@ -112,6 +112,8 @@ internal static class Program
             app.Logger.LogError("ASPNETCORE_ENVIRONMENT env var not defined.");
         }
 
+        var retrievalMemoryDbTypes = app.Configuration.GetSection("KernelMemory").GetSection("Retrieval").GetSection("MemoryDbType").Value;
+        var dataIngestionMemoryDbTypes = app.Configuration.GetSection("KernelMemory").GetSection("DataIngestion").GetSection("MemoryDbTypes").Value;
         var connectionString = app.Configuration.GetSection("KernelMemory").GetSection("Services").GetSection("Redis").GetSection("ConnectionString").Value;
 
         Console.WriteLine("***************************************************************************************************************************");
@@ -127,6 +129,9 @@ internal static class Program
         Console.WriteLine("* Text generation     : " + app.Services.GetService<ITextGenerator>()?.GetType().FullName);
         Console.WriteLine("* Log level           : " + app.Logger.GetLogLevelName());
         Console.WriteLine("* Redis connection string:" + connectionString);
+        Console.WriteLine("* Retrieval MemoryDb Types:" + retrievalMemoryDbTypes);
+        Console.WriteLine("* DataIngestion MemoryDb Types:" + dataIngestionMemoryDbTypes);
+        Console.WriteLine("* ");
         Console.WriteLine("***************************************************************************************************************************");
 
         try
