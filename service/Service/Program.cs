@@ -112,10 +112,6 @@ internal static class Program
             app.Logger.LogError("ASPNETCORE_ENVIRONMENT env var not defined.");
         }
 
-        var retrievalMemoryDbTypes = app.Configuration.GetSection("KernelMemory").GetSection("Retrieval").GetSection("MemoryDbType").Value;
-        var dataIngestionMemoryDbTypes = app.Configuration.GetSection("KernelMemory").GetSection("DataIngestion").GetSection("MemoryDbTypes").Value;
-        var connectionString = app.Configuration.GetSection("KernelMemory").GetSection("Services").GetSection("Redis").GetSection("ConnectionString").Value;
-
         Console.WriteLine("***************************************************************************************************************************");
         Console.WriteLine("* Environment         : " + (string.IsNullOrEmpty(env) ? "WARNING: ASPNETCORE_ENVIRONMENT env var not defined" : env));
         Console.WriteLine("* Memory type         : " + ((memory is MemoryServerless) ? "Sync - " : "Async - ") + memory.GetType().FullName);
@@ -128,26 +124,7 @@ internal static class Program
         Console.WriteLine("* Embedding generation: " + app.Services.GetService<ITextEmbeddingGenerator>()?.GetType().FullName);
         Console.WriteLine("* Text generation     : " + app.Services.GetService<ITextGenerator>()?.GetType().FullName);
         Console.WriteLine("* Log level           : " + app.Logger.GetLogLevelName());
-        Console.WriteLine("* Redis connection string:" + connectionString);
-        Console.WriteLine("* Retrieval MemoryDb Types:" + retrievalMemoryDbTypes);
-        Console.WriteLine("* DataIngestion MemoryDb Types:" + dataIngestionMemoryDbTypes);
-        Console.WriteLine("* ");
         Console.WriteLine("***************************************************************************************************************************");
-
-        try
-        {
-            var redis = ConnectionMultiplexer.Connect(connectionString);
-            var db = redis.GetDatabase();
-
-            db.StringSet("monesy", "test");
-            var value = db.StringGet("monesy");
-            Console.WriteLine($"Stored value in redis {value}");
-            Console.WriteLine("Redis connectSuccessful");
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-        }
 
         app.Logger.LogInformation(
             "Starting Kernel Memory service, .NET Env: {0}, Log Level: {1}, Web service: {2}, Auth: {3}, Pipeline handlers: {4}",
