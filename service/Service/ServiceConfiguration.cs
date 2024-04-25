@@ -2,11 +2,13 @@
 
 using System;
 using System.Collections.Generic;
+using Correlate.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.KernelMemory.AI;
 using Microsoft.KernelMemory.Configuration;
 using Microsoft.KernelMemory.ContentStorage.DevTools;
+using Microsoft.KernelMemory.Extensions;
 using Microsoft.KernelMemory.MemoryStorage;
 using Microsoft.KernelMemory.MemoryStorage.DevTools;
 using Microsoft.KernelMemory.Pipeline.Queue.DevTools;
@@ -110,6 +112,12 @@ internal sealed class ServiceConfiguration
         this.ConfigureTextGenerator(builder);
 
         this.ConfigureImageOCR(builder);
+
+        builder.Services.AddCorrelate(options => options.RequestHeaders = new string[]
+        {
+            "CorrelationId", "X-Correlation-ID", "x-correlation-id"
+        });
+        builder.Services.AddHttpClientInternal();
 
         return builder;
     }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Correlate.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,7 @@ internal static class WebAPIEndpoints
         app.UseAskEndpoint(authFilter);
         app.UseSearchEndpoint(authFilter);
         app.UseUploadStatusEndpoint(authFilter);
+        app.UseCorrelate();
     }
 
     public static void UseGetStatusEndpoint(this IEndpointRouteBuilder app, IEndpointFilter? authFilter = null)

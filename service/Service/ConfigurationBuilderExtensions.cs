@@ -3,7 +3,9 @@
 using System;
 using System.IO;
 using System.Reflection;
+using Correlate;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.KernelMemory.Configuration;
 
 namespace Microsoft.KernelMemory.Service;
@@ -94,5 +96,23 @@ internal static class ConfigurationBuilderExtensions
             // Support for environment variables overriding the config files
             builder.AddEnvironmentVariables();
         }
+    }
+
+    public static void AddHttpClientInternal(this IServiceCollection services)
+    {
+        services.AddHttpClient(string.Empty, (sp, c) =>
+        {
+            var correlationContextAccessor = sp.GetRequiredService<ICorrelationContextAccessor>();
+
+            if (correlationContextAccessor.CorrelationContext == null)
+            {
+                return;
+            }
+
+            foreach (var correlationIdHeader in new string[] { "CorrelationId", "X-Correlation-ID", "x-correlation-id" })
+            {
+                c.DefaultRequestHeaders.Add(correlationIdHeader, correlationContextAccessor.CorrelationContext.CorrelationId);
+            }
+        });
     }
 }
