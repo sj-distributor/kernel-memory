@@ -113,12 +113,6 @@ internal sealed class ServiceConfiguration
 
         this.ConfigureImageOCR(builder);
 
-        builder.Services.AddCorrelate(options => options.RequestHeaders = new string[]
-        {
-            "CorrelationId", "X-Correlation-ID", "x-correlation-id"
-        });
-        builder.Services.AddHttpClientInternal();
-
         return builder;
     }
 

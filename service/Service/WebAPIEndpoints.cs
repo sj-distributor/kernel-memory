@@ -26,6 +26,7 @@ internal static class WebAPIEndpoints
 
         var authFilter = new HttpAuthEndpointFilter(config.ServiceAuthorization);
 
+        app.UseCorrelate();
         app.UseGetStatusEndpoint(authFilter);
         app.UsePostUploadEndpoint(authFilter);
         app.UseGetIndexesEndpoint(authFilter);
@@ -34,7 +35,6 @@ internal static class WebAPIEndpoints
         app.UseAskEndpoint(authFilter);
         app.UseSearchEndpoint(authFilter);
         app.UseUploadStatusEndpoint(authFilter);
-        app.UseCorrelate();
     }
 
     public static void UseGetStatusEndpoint(this IEndpointRouteBuilder app, IEndpointFilter? authFilter = null)

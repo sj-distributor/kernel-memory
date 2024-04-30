@@ -85,6 +85,7 @@ internal static class Program
         appBuilder.Services.AddSingleton(Log.Logger);
         appBuilder.Host.UseSerilog(Log.Logger, dispose: true).ConfigureLogging(l => l.AddSerilog(Log.Logger));
         appBuilder.Services.AddCorrelate(options => options.RequestHeaders = new[] { "CorrelationId", "X-Correlation-ID", "x-correlation-id" });
+        appBuilder.Services.AddHttpClientInternal();
 
         IConfigurationSection serilog = appBuilder.Configuration.GetSection("Serilog").GetSection("Seq");
         Log.Logger = new LoggerConfiguration()
